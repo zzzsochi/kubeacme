@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+set -e
+
+if [ -z ${KUBE_TOKEN} ]; then
+    echo "Variable KUBE_TOKEN is required!" > /dev/stderr
+    exit 1
+fi
+
+if [ -z ${KUBE_SERVER} ]; then
+    export KUBE_SERVER="https://kubernetes.default.svc.cluster.local"
+fi
+
+kubectl config set-cluster default --server="${KUBE_SERVER}" --insecure-skip-tls-verify=true
+kubectl config set-credentials default --token="${KUBE_TOKEN}"
+kubectl config set-context default --cluster=default --user=default
+kubectl config use-context default

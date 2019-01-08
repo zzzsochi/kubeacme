@@ -1,0 +1,37 @@
+#!/usr/bin/env sh
+
+set -e -v
+
+kubesetup
+
+if [ -z ${KUBE_SECRET_NAME} ]; then
+    echo "Variable KUBE_SECRET_NAME is required!" > /dev/stderr
+    exit 1
+fi
+
+rm -rf /tmp/certs
+mkdir /tmp/certs
+
+acme.sh --issue \
+    --cert-file /tmp/certs/domains.cer \
+    --key-file /tmp/certs/domains.key \
+    --ca-file /tmp/certs/ca.cer \
+    --fullchain-file /tmp/certs/fullchain.cer \
+    $@
+
+openssl dhparam -out /tmp/certs/dhparams.pem 2048
+
+kubectl apply -f - << EOF
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: ${KUBE_SECRET_NAME}
+type: Opaque
+data:
+  domains.cer: "$(cat /tmp/certs/domains.cer | base64 | tr -d '\n')"
+  domains.key: "$(cat /tmp/certs/domains.key | base64 | tr -d '\n')"
+  ca.cer: "$(cat /tmp/certs/ca.cer | base64 | tr -d '\n')"
+  fullchain.cer: "$(cat /tmp/certs/fullchain.cer | base64 | tr -d '\n')"
+  dhparams.pem: "$(cat /tmp/certs/dhparams.pem | base64 | tr -d '\n')"
+EOF
