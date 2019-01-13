@@ -1,4 +1,4 @@
-# SSL with Let's Encrypt to kubernates secrets
+# SSL with Let's Encrypt to kubernetes secrets
 
 Uses the [acme.sh](https://github.com/Neilpang/acme.sh).
 
@@ -37,6 +37,8 @@ spec:
                 secretKeyRef:
                   name: digitalocean
                   key: key
+            - name: KUBEACME_POST_COMMAND
+              value: kubectl get pod -l role=service -l app=gate -o 'jsonpath={range .items[*]}{.metadata.name}{"\n"}{end}' | xargs -I {POD} kubectl exec {POD} -c gate -- sh -c 'nginx -t && nginx -s reload'
 ```
 
 ## /usr/local/bin/kubesetup
@@ -49,9 +51,13 @@ kubesetup
 kubectl get all
 ```
 
-Variable ``KUBE_SERVER`` set the kubernates server. Default: ``https://kubernetes.default.svc.cluster.local``
+Variable ``KUBE_SERVER`` set the kubernetes server. Default: ``https://kubernetes.default.svc.cluster.local``
 
 ## /usr/local/bin/kubeacme
 
 Need to set ``KUBE_SECRET_NAME``.
 All arguments passed to [acme.sh](https://github.com/Neilpang/acme.sh).
+
+### Reload nginx
+
+``KUBEACME_POST_COMMAND`` variable with command witch run after update certs.

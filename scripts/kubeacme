@@ -35,3 +35,7 @@ data:
   fullchain.cer: "$(cat /tmp/certs/fullchain.cer | base64 | tr -d '\n')"
   dhparams.pem: "$(cat /tmp/certs/dhparams.pem | base64 | tr -d '\n')"
 EOF
+
+if [ ! -z "${KUBEACME_POST_COMMAND}" ]; then
+    sh -c "${KUBEACME_POST_COMMAND}"
+fi
