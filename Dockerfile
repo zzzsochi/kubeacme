@@ -1,7 +1,7 @@
 FROM neilpang/acme.sh
 LABEL maintainer="Alexander Zelenyak <zzz.sochi@gmail.com>"
 
-ARG KUBECTL_VERSION=v1.13.1
+ARG KUBECTL_VERSION=v1.17.2
 
 ADD https://storage.googleapis.com/kubernetes-release/release/${KUBECTL_VERSION}/bin/linux/amd64/kubectl /usr/local/bin/kubectl
 ADD scripts/kubesetup /usr/local/bin/kubesetup
