@@ -2,7 +2,9 @@
 
 set -e -v
 
-kubesetup
+if [ ! -z ${KUBE_TOKEN} ]; then
+  kubesetup
+fi
 
 if [ -z ${KUBE_SECRET_NAME} ]; then
     echo "Variable KUBE_SECRET_NAME is required!" > /dev/stderr
